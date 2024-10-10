@@ -50,9 +50,21 @@ logger.info(f'Train-val split = {TRAIN_SPLIT:.2f}-{VAL_SPLIT:.2f}')
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load the KMNIST dataset
-trainData = KMNIST(root='data', train=True, download=True,
+logger.info("Loading the train-test datasets...")
+# Define the path where the KMNIST dataset is stored
+DATASET_PATH = 'data/KMNIST/raw'
+
+# Check if the dataset is already downloaded
+if os.path.exists(DATASET_PATH):
+    logger.info("KMNIST dataset already exists. Loading it directly...")
+    download = False  # No need to download again
+else:
+    logger.info("KMNIST dataset not found. Downloading...")
+    download = True  # Download if not found
+
+trainData = KMNIST(root='data', train=True, download=download,
                    transform=ToTensor())
-testData = KMNIST(root='data', train=False, download=True,
+testData = KMNIST(root='data', train=False, download=download,
                   transform=ToTensor())
 logger.info("Loaded the train-test datasets")
 
