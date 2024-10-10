@@ -1,7 +1,4 @@
 # Hiragana-character-classifier
-A CNN to classify Japanese Hiragana characters
-
-# KMNIST Classification using LeNet
 
 This project implements a simple deep learning model (LeNet) to classify Japanese Hiragana characters. The model is built using PyTorch and is trained on the KMNIST dataset. It provides a training pipeline, model evaluation, and visualisation of training history.
 
