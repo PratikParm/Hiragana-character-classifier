@@ -3,6 +3,7 @@ matplotlib.use("Agg")
 
 import os
 import logging
+from pathlib import Path
 from tqdm import tqdm
 from datetime import datetime
 from pyimagesearch.lenet import LeNet
@@ -26,10 +27,11 @@ logger = logging.getLogger(__name__)
 
 # Constructing argument parser
 ap = argparse.ArgumentParser()
-ap.add_argument("-m", "--model", type=str, required=True,
-                help="path to output trained model")
-ap.add_argument("-p", "--plot", type=str, required=True,
-                help="path to output loss/accuracy plot")
+ap.add_argument("-m", "--model", type=str, default=".\output\model.pth",
+                help="path to output trained model (default: .\output\model.pth)")
+ap.add_argument("-p", "--plot", type=str, default=".\output\plot.png",
+                help="path to output loss/accuracy plot (default: .\output\model.pth)")
+
 args = vars(ap.parse_args())
 
 # Define training hyperparameters
@@ -191,16 +193,20 @@ with torch.no_grad():
     model.eval()
 
     preds = []
-
+    trues = []
     for (x, y) in testDataLoader:
         x = x.to(device)
 
         pred = model(x)
         preds.extend(pred.argmax(axis=1).cpu().numpy())
+        trues.extend(y.cpu().numpy())
 
     # Generate classification report
-    print(classification_report(testData.targets.cpu().numpy(),
-                                np.array(preds), target_names=testData.classes))
+    report = classification_report(np.array(trues),
+                                np.array(preds), target_names=testData.classes)
+    print(report)
+    with open('output/classification_report.txt', 'w') as f:
+        f.write(report)
 
 # plot the training loss and accuracy
 plt.style.use("ggplot")
@@ -218,9 +224,9 @@ plt.legend(loc="lower left")
 if not os.path.exists('output'):
     os.makedirs('output')
 
-plt.savefig(args["plot"])
+plt.savefig(Path(args["plot"]))
 
 # serialize the model to disk
-torch.save(model, args["model"])
+torch.save(model, Path(args["model"]))
 
 logger.info("train.py has run successfully")
